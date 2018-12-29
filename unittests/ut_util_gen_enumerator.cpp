@@ -60,11 +60,49 @@ namespace {
     }
 
     template<class Iterable>
-    void test_iterable() {
+    void test_iterable_wo_starting_index() {
         test<Iterable, false, false>();
         test<Iterable, true, false>();
         test<Iterable, false, true>();
         test<Iterable, true, true>();
+    }
+
+
+    template<class Iterable, bool CONST, bool RVALUE>
+    void test_start_idx(int64_t starting_idx) {
+        auto&& iterable = get_iterable<Iterable, CONST, RVALUE>();
+        for(auto&&[idx, value] : util::gen::Enumerator{get_iterable<Iterable, CONST, RVALUE>(), starting_idx}) {
+            using ValueType = decltype(value);
+            static_assert(std::is_lvalue_reference_v<ValueType>);
+            static_assert(std::is_const_v<std::remove_reference_t<ValueType>> == CONST);
+
+            CHECK(idx == value + starting_idx);
+            if constexpr(!CONST && !RVALUE) {
+                value = 10;
+            }
+        }
+
+        if constexpr(!CONST && !RVALUE) {
+            for(auto&& value : iterable) {
+                CHECK(value == 10);
+            }
+        }
+    }
+
+    template<class Iterable>
+    void test_iterable_w_starting_idx(int64_t starting_idx) {
+        test_start_idx<Iterable, false, false>(starting_idx);
+        test_start_idx<Iterable, true, false>(starting_idx);
+        test_start_idx<Iterable, false, true>(starting_idx);
+        test_start_idx<Iterable, true, true>(starting_idx);
+    }
+
+    template<class Iterable>
+    void test_iterable() {
+        test_iterable_wo_starting_index<Iterable>();
+        test_iterable_w_starting_idx<Iterable>(0);
+        test_iterable_w_starting_idx<Iterable>(7);
+        test_iterable_w_starting_idx<Iterable>(-8);
     }
 }
 
@@ -114,37 +152,6 @@ TEST_CASE("Enumerator c-style array") {
 
             CHECK(idx == value);
         }
-    }
-}
-
-TEST_CASE("Enumerator starting index") {
-    std::vector<int> vec = get_iterable<std::vector<int>, false, true>();
-
-    auto test = [&vec](int64_t starting_idx) {
-        for(auto&&[idx, value] : util::gen::Enumerator{vec, starting_idx}) {
-            using ValueType = decltype(value);
-            static_assert(std::is_lvalue_reference_v<ValueType>);
-            static_assert(!std::is_const_v<std::remove_reference_t<ValueType>>);
-
-            CHECK(idx == value + starting_idx);
-            value = idx;
-        }
-
-        for(auto&&[idx, value] : util::gen::Enumerator{vec, starting_idx}) {
-            CHECK(idx == value);
-        }
-    };
-
-    SECTION("Zero") {
-        test(0);
-    }
-
-    SECTION("Positive") {
-        test(7);
-    }
-
-    SECTION("Negative") {
-        test(-8);
     }
 }
 
