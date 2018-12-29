@@ -3,5 +3,6 @@ project(utilities_ut)
 
 add_executable(utilities_ut
         ut_util.cpp
+        ut_util_gen_generator.cpp
     )
 target_link_libraries(utilities_ut utilities)
