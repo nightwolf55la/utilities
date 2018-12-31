@@ -1,27 +1,12 @@
 #pragma once
 
-namespace util::gen {
-    struct GeneratorEnd {};
+#include "generator_iterator.h"
 
+namespace util::gen {
     template<class Impl>
     class Generator : public Impl {
     private:
-        class Iterator {
-        public:
-            explicit Iterator(Generator& generator) : generator_(generator) { }
-            Iterator(const Iterator&) = default;
-            Iterator(Iterator&&) noexcept = default;
-            Iterator& operator=(const Iterator&) = default;
-            Iterator& operator=(Iterator&&) noexcept = default;
-
-        public:
-            decltype(auto) operator*() { return *generator_; }
-            Iterator& operator++() { ++generator_; return *this; }
-            bool operator!=(const GeneratorEnd&) const { return generator_.operator bool(); }
-
-        private:
-            Generator& generator_;
-        };
+        using Iterator = GeneratorIterator<Generator>;
 
     public:
         Iterator begin() { return Iterator(*this); }
