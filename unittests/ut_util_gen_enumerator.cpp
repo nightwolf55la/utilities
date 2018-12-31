@@ -40,6 +40,7 @@ namespace {
 
     template<class Iterable, bool CONST, bool RVALUE>
     void test() {
+        Iterable i{}; // Clang 6.0 compilation segfaults without this line
         auto&& iterable = get_iterable<Iterable, CONST, RVALUE>();
         for(auto&&[idx, value] : util::gen::Enumerator{get_iterable<Iterable, CONST, RVALUE>()}) {
             using ValueType = decltype(value);
