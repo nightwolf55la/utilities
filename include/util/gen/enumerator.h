@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generator.h"
+#include "generator_iterator.h"
 #include "../always_false.h"
 
 namespace util::gen {
@@ -17,7 +17,7 @@ namespace util::gen {
     };
 
     template<class Iterable>
-    class EnumeratorImpl {
+    class Enumerator {
     public:
         Iterable iterable_;
         int64_t starting_idx_ = 0;
@@ -27,14 +27,20 @@ namespace util::gen {
         State state_{starting_idx_, std::begin(iterable_)};
 
     public:
+        Enumerator(const Enumerator&) = delete;
+        Enumerator(Enumerator&&) = delete;
+        Enumerator& operator=(const Enumerator&) = delete;
+        Enumerator& operator=(Enumerator&&) = delete;
+
+    public:
+        using Iterator = GeneratorIterator<Enumerator>;
+        Iterator begin() { return Iterator{*this}; }
+        GeneratorEnd end() { return {}; }
+
+    public:
         State& operator*() { return state_; }
         void operator++() { ++state_.idx_; ++state_.iter_; }
         operator bool() const { return state_.iter_ != std::end(iterable_); }
-    };
-
-    template<class Iterable>
-    struct Enumerator : Generator<EnumeratorImpl<Iterable>> {
-        // Empty
     };
 
     template<class Iterable>
