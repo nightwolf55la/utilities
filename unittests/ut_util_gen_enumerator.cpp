@@ -181,7 +181,7 @@ TEST_CASE("Enumerator enumerate shortcut") {
             static_assert(!std::is_const_v<std::remove_reference_t<ValueType>>);
 
             CHECK(idx == value + 10);
-            value = idx;
+            value = static_cast<int>(idx);
         }
 
         for(auto&&[idx, value] : util::gen::enumerate(vec, 10)) {
