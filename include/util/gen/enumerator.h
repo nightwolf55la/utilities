@@ -68,6 +68,11 @@ namespace util::gen {
     }
 }
 
+#if defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmismatched-tags"
+#endif
+
 namespace std {
     template<std::size_t N, class UnderlyingIterator>
     struct tuple_element<N, util::gen::EnumeratorState<UnderlyingIterator>> {
@@ -79,3 +84,7 @@ namespace std {
         // Empty
     };
 }
+
+#if defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
