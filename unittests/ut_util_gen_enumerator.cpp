@@ -5,7 +5,7 @@
 #include <deque>
 #include <list>
 #include <forward_list>
-#include <util/gen/enumerator.h>
+#include <util/gen/enumerate.h>
 
 namespace {
     template<class Iterable, bool CONST>
