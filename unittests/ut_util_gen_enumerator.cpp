@@ -42,7 +42,7 @@ namespace {
     void test() {
         [[maybe_unused]] Iterable i{}; // Clang 6.0 compilation segfaults without this line
         auto&& iterable = get_iterable<Iterable, CONST, RVALUE>();
-        for(auto&&[idx, value] : util::gen::Enumerator{get_iterable<Iterable, CONST, RVALUE>()}) {
+        for(auto&&[idx, value] : util::gen::enumerate{get_iterable<Iterable, CONST, RVALUE>()}) {
             using ValueType = decltype(value);
             static_assert(std::is_lvalue_reference_v<ValueType>);
             static_assert(std::is_const_v<std::remove_reference_t<ValueType>> == CONST);
@@ -72,7 +72,7 @@ namespace {
     template<class Iterable, bool CONST, bool RVALUE>
     void test_start_idx(int64_t starting_idx) {
         auto&& iterable = get_iterable<Iterable, CONST, RVALUE>();
-        for(auto&&[idx, value] : util::gen::Enumerator{get_iterable<Iterable, CONST, RVALUE>(), starting_idx}) {
+        for(auto&&[idx, value] : util::gen::enumerate{get_iterable<Iterable, CONST, RVALUE>(), starting_idx}) {
             using ValueType = decltype(value);
             static_assert(std::is_lvalue_reference_v<ValueType>);
             static_assert(std::is_const_v<std::remove_reference_t<ValueType>> == CONST);
@@ -107,30 +107,30 @@ namespace {
     }
 }
 
-TEST_CASE("Enumerator std::vector") {
+TEST_CASE("enumerate std::vector") {
     test_iterable<std::vector<int>>();
 }
 
-TEST_CASE("Enumerator std::deque") {
+TEST_CASE("enumerate std::deque") {
     test_iterable<std::deque<int>>();
 }
 
-TEST_CASE("Enumerator std::list") {
+TEST_CASE("enumerate std::list") {
     test_iterable<std::list<int>>();
 }
 
-TEST_CASE("Enumerator std::forward_list") {
+TEST_CASE("enumerate std::forward_list") {
     test_iterable<std::forward_list<int>>();
 }
 
-TEST_CASE("Enumerator std::array") {
+TEST_CASE("enumerate std::array") {
     test_iterable<std::array<int, 5>>();
 }
 
-TEST_CASE("Enumerator c-style array") {
+TEST_CASE("enumerate c-style array") {
     SECTION("LValue") {
         int arr[5] = {0, 1, 2, 3, 4};
-        for(auto&&[idx, value] : util::gen::Enumerator{arr}) {
+        for(auto&&[idx, value] : util::gen::enumerate{arr}) {
             using ValueType = decltype(value);
             static_assert(std::is_lvalue_reference_v<ValueType>);
             static_assert(!std::is_const_v<std::remove_reference_t<ValueType>>);
@@ -146,45 +146,11 @@ TEST_CASE("Enumerator c-style array") {
 
     SECTION("Const LValue") {
         const int arr[5] = {0, 1, 2, 3, 4};
-        for(auto&&[idx, value] : util::gen::Enumerator{arr}) {
+        for(auto&&[idx, value] : util::gen::enumerate{arr}) {
             using ValueType = decltype(value);
             static_assert(std::is_lvalue_reference_v<ValueType>);
             static_assert(std::is_const_v<std::remove_reference_t<ValueType>>);
 
-            CHECK(idx == value);
-        }
-    }
-}
-
-TEST_CASE("Enumerator enumerate shortcut") {
-    SECTION("Default starting idx") {
-        std::vector<int> vec = get_iterable<std::vector<int>, false, true>();
-        for(auto&&[idx, value] : util::gen::enumerate(vec)) {
-            using ValueType = decltype(value);
-            static_assert(std::is_lvalue_reference_v<ValueType>);
-            static_assert(!std::is_const_v<std::remove_reference_t<ValueType>>);
-
-            CHECK(idx == value);
-            value = 10;
-        }
-
-        for(int value : vec) {
-            CHECK(value == 10);
-        }
-    }
-
-    SECTION("Starting idx") {
-        std::vector<int> vec = get_iterable<std::vector<int>, false, true>();
-        for(auto&&[idx, value] : util::gen::enumerate(vec, 10)) {
-            using ValueType = decltype(value);
-            static_assert(std::is_lvalue_reference_v<ValueType>);
-            static_assert(!std::is_const_v<std::remove_reference_t<ValueType>>);
-
-            CHECK(idx == value + 10);
-            value = static_cast<int>(idx);
-        }
-
-        for(auto&&[idx, value] : util::gen::enumerate(vec, 10)) {
             CHECK(idx == value);
         }
     }

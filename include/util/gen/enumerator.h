@@ -1,11 +1,10 @@
 #pragma once
 
 #include "generator_iterator.h"
-#include "../always_false.h"
 
 namespace util::gen {
     template<class UnderlyingIterator>
-    struct EnumeratorState {
+    struct EnumerateState {
         int64_t idx_;
         UnderlyingIterator iter_;
 
@@ -17,23 +16,23 @@ namespace util::gen {
     };
 
     template<class Iterable>
-    class Enumerator {
+    class enumerate {
     public:
         Iterable iterable_;
         int64_t starting_idx_ = 0;
 
     public:
-        using State = EnumeratorState<decltype(std::begin(iterable_))>;
+        using State = EnumerateState<decltype(std::begin(iterable_))>;
         State state_{starting_idx_, std::begin(iterable_)};
 
     public:
-        constexpr Enumerator(const Enumerator&) = delete;
-        constexpr Enumerator(Enumerator&&) = delete;
-        constexpr Enumerator& operator=(const Enumerator&) = delete;
-        constexpr Enumerator& operator=(Enumerator&&) = delete;
+        constexpr enumerate(const enumerate&) = delete;
+        constexpr enumerate(enumerate&&) = delete;
+        constexpr enumerate& operator=(const enumerate&) = delete;
+        constexpr enumerate& operator=(enumerate&&) = delete;
 
     public:
-        using Iterator = GeneratorIterator<Enumerator>;
+        using Iterator = GeneratorIterator<enumerate>;
         constexpr Iterator begin() { return Iterator{*this}; }
         constexpr GeneratorEnd end() { return {}; }
 
@@ -44,28 +43,10 @@ namespace util::gen {
     };
 
     template<class Iterable>
-    Enumerator(Iterable&& iterable) -> Enumerator<decltype(iterable)>;
+    enumerate(Iterable&& iterable) -> enumerate<decltype(iterable)>;
 
     template<class Iterable>
-    Enumerator(Iterable&& iterable, int64_t) -> Enumerator<decltype(iterable)>;
-
-    template<class Iterable>
-    auto enumerate(Iterable&& iterable) {
-        if constexpr(std::is_rvalue_reference_v<decltype(iterable)>) {
-            static_assert(always_false_v<Iterable>);
-        } else {
-            return Enumerator{iterable};
-        }
-    }
-
-    template<class Iterable>
-    auto enumerate(Iterable&& iterable, int64_t starting_idx) {
-        if constexpr(std::is_rvalue_reference_v<decltype(iterable)>) {
-            static_assert(always_false_v<Iterable>);
-        } else {
-            return Enumerator{iterable, starting_idx};
-        }
-    }
+    enumerate(Iterable&& iterable, int64_t) -> enumerate<decltype(iterable)>;
 }
 
 #if defined(__clang__)
@@ -75,12 +56,12 @@ namespace util::gen {
 
 namespace std {
     template<std::size_t N, class UnderlyingIterator>
-    struct tuple_element<N, util::gen::EnumeratorState<UnderlyingIterator>> {
-        using type = decltype(std::declval<util::gen::EnumeratorState<UnderlyingIterator>>().template get<N>());
+    struct tuple_element<N, util::gen::EnumerateState<UnderlyingIterator>> {
+        using type = decltype(std::declval<util::gen::EnumerateState<UnderlyingIterator>>().template get<N>());
     };
 
     template<class UnderlyingIterator>
-    struct tuple_size<util::gen::EnumeratorState<UnderlyingIterator>> : std::integral_constant<std::size_t, 2> {
+    struct tuple_size<util::gen::EnumerateState<UnderlyingIterator>> : std::integral_constant<std::size_t, 2> {
         // Empty
     };
 }
