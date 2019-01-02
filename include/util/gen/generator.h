@@ -9,17 +9,17 @@ namespace util::gen {
         using Iterator = GeneratorIterator<Generator>;
 
     public:
-        Iterator begin() { return Iterator(*this); }
-        GeneratorEnd end() { return {}; }
+        constexpr Iterator begin() { return Iterator(*this); }
+        constexpr GeneratorEnd end() { return {}; }
 
-        decltype(auto) operator*() { return Impl::operator*(); }
-        void operator++() { Impl::operator++(); } // TODO: Should this return a Generator& (*this)
-        explicit operator bool() const { return Impl::operator bool(); }
+        constexpr decltype(auto) operator*() { return Impl::operator*(); }
+        constexpr void operator++() { Impl::operator++(); } // TODO: Should this return a Generator& (*this)
+        constexpr explicit operator bool() const { return Impl::operator bool(); }
 
     public:
-        Generator(const Generator&) = delete;
-        Generator(Generator&&) = delete;
-        Generator& operator=(const Generator&) = delete;
-        Generator& operator=(Generator&&) = delete;
+        constexpr Generator(const Generator&) = delete;
+        constexpr Generator(Generator&&) = delete;
+        constexpr Generator& operator=(const Generator&) = delete;
+        constexpr Generator& operator=(Generator&&) = delete;
     };
 }

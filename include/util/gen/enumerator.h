@@ -27,20 +27,20 @@ namespace util::gen {
         State state_{starting_idx_, std::begin(iterable_)};
 
     public:
-        Enumerator(const Enumerator&) = delete;
-        Enumerator(Enumerator&&) = delete;
-        Enumerator& operator=(const Enumerator&) = delete;
-        Enumerator& operator=(Enumerator&&) = delete;
+        constexpr Enumerator(const Enumerator&) = delete;
+        constexpr Enumerator(Enumerator&&) = delete;
+        constexpr Enumerator& operator=(const Enumerator&) = delete;
+        constexpr Enumerator& operator=(Enumerator&&) = delete;
 
     public:
         using Iterator = GeneratorIterator<Enumerator>;
-        Iterator begin() { return Iterator{*this}; }
-        GeneratorEnd end() { return {}; }
+        constexpr Iterator begin() { return Iterator{*this}; }
+        constexpr GeneratorEnd end() { return {}; }
 
     public:
-        State& operator*() { return state_; }
-        void operator++() { ++state_.idx_; ++state_.iter_; }
-        operator bool() const { return state_.iter_ != std::end(iterable_); }
+        constexpr State& operator*() { return state_; }
+        constexpr void operator++() { ++state_.idx_; ++state_.iter_; }
+        constexpr explicit operator bool() const { return state_.iter_ != std::end(iterable_); }
     };
 
     template<class Iterable>

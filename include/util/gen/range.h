@@ -5,7 +5,7 @@
 namespace util::gen {
     class RangeImpl {
     public:
-        RangeImpl(int64_t begin, int64_t end, int64_t step)
+        constexpr RangeImpl(int64_t begin, int64_t end, int64_t step)
             : val_(begin)
             , step_(step)
             , comparison_mod_(step < 0 ? -1 : 1)
@@ -15,9 +15,9 @@ namespace util::gen {
         }
 
     public:
-        int64_t operator*() { return val_; }
-        void operator++() { val_ += step_; }
-        operator bool() const { return (val_ * comparison_mod_) < modded_end_; }
+        constexpr int64_t operator*() { return val_; }
+        constexpr void operator++() { val_ += step_; }
+        constexpr explicit operator bool() const { return (val_ * comparison_mod_) < modded_end_; }
 
     private:
         int64_t val_;
@@ -28,15 +28,15 @@ namespace util::gen {
 
     using Range = Generator<RangeImpl>;
 
-    Range range(int64_t end) {
+    constexpr Range range(int64_t end) {
         return Range{{0, end, 1}};
     }
 
-    Range range(int64_t begin, int64_t end) {
+    constexpr Range range(int64_t begin, int64_t end) {
         return Range{{begin, end, 1}};
     }
 
-    Range range(int64_t begin, int64_t end, int64_t step) {
+    constexpr Range range(int64_t begin, int64_t end, int64_t step) {
         return Range{{begin, end, step}};
     }
 }
