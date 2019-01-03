@@ -60,6 +60,8 @@ namespace util::gen {
 
     ////////////////////////////////////////////////////////////////////////////////
     // Deduction guides
+    //      enumerate{some_iterable}
+    //      enumerate{some_iterable, starting_index}
     ////////////////////////////////////////////////////////////////////////////////
     template<class Iterable>
     enumerate(Iterable&& iterable) -> enumerate<decltype(iterable)>;
