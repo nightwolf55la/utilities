@@ -69,6 +69,14 @@ namespace util::gen {
     template<class Iterable>
     enumerate(Iterable&& iterable, int64_t) -> enumerate<decltype(iterable)>;
 
+    // Clang and MSVC do not seem to be able to support this for various reasons at this time
+#ifdef __GNUC__
+#ifndef __clang__
+    template<class ValueType> enumerate(std::initializer_list<ValueType>&& iterable) -> enumerate<decltype(iterable)>;
+    template<class ValueType> enumerate(std::initializer_list<ValueType>&& iterable, int64_t) -> enumerate<decltype(iterable)>;
+#endif
+#endif
+
     ////////////////////////////////////////////////////////////////////////////////
     // EnumerateState - This represents the state of the enumerate generator
     ////////////////////////////////////////////////////////////////////////////////

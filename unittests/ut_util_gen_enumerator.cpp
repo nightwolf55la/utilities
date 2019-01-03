@@ -155,3 +155,19 @@ TEST_CASE("enumerate c-style array") {
         }
     }
 }
+
+#ifdef __GNUC__
+#ifndef __clang__
+TEST_CASE("enumerate initializer list") {
+    SECTION("LValue") {
+        for(auto&&[idx, value] : util::gen::enumerate{{0,1,2,3,4}}) {
+            using ValueType = decltype(value);
+            static_assert(std::is_lvalue_reference_v<ValueType>);
+            static_assert(std::is_const_v<std::remove_reference_t<ValueType>>);
+
+            CHECK(idx == value);
+        }
+    }
+}
+#endif
+#endif
