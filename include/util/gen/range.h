@@ -16,7 +16,7 @@ namespace util::gen {
 
     public:
         constexpr int64_t operator*() { return val_; }
-        constexpr void operator++() { val_ += step_; }
+        constexpr RangeImpl& operator++() { val_ += step_; return *this; }
         constexpr explicit operator bool() const { return (val_ * comparison_mod_) < modded_end_; }
 
     private:

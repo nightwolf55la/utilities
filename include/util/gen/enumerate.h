@@ -54,7 +54,7 @@ namespace util::gen {
         // operators - Emulating the generator class's operators
         //------------------------------------------------------------------------------
         constexpr State& operator*() { return state_; }
-        constexpr void operator++() { ++state_.idx_; ++state_.iter_; }
+        constexpr enumerate& operator++() { ++state_.idx_; ++state_.iter_; return *this; }
         constexpr explicit operator bool() const { return state_.iter_ != std::end(iterable_); }
     };
 

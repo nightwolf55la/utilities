@@ -33,7 +33,7 @@ namespace util::gen {
         //                 Once the generator should not be advanced anymore, this should return false
         //------------------------------------------------------------------------------
         constexpr decltype(auto) operator*() { return Impl::operator*(); }
-        constexpr void operator++() { Impl::operator++(); } // TODO: Should this return a Generator& (*this)
+        constexpr Generator& operator++() { Impl::operator++(); return *this; }
         constexpr explicit operator bool() const { return Impl::operator bool(); }
 
     public:
