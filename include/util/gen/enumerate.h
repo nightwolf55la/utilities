@@ -87,7 +87,7 @@ namespace util::gen {
 
         // Enables structured bindings
         template <std::size_t N>
-        decltype(auto) get() const {
+        constexpr decltype(auto) get() const {
             if      constexpr (N == 0) return idx_;
             else if constexpr (N == 1) return *iter_;
         }
