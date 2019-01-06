@@ -76,14 +76,18 @@ namespace util::gen {
     template<size_t IDX, class CurrentIterable>
     struct ZipStorage<IDX, CurrentIterable> {
         CurrentIterable iterable;
+
+        constexpr auto begin() { return std::begin(iterable); }
     };
-    
+
     template<size_t IDX, class CurrentIterable, class... RemainingIterables>
     struct ZipStorage<IDX, CurrentIterable, RemainingIterables...> {
         CurrentIterable iterable;
 
         using NextStorage = ZipStorage<IDX+1, RemainingIterables...>;
         NextStorage next_storage;
+
+        constexpr auto begin() { return std::begin(iterable); }
     };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +97,7 @@ namespace util::gen {
     struct ZipState<IDX, CurrentIterable> {
         // Construct from a ZipStorage matching this depth
         explicit constexpr ZipState(ZipStorage<IDX, CurrentIterable>& storage)
-                : iterator(std::begin(storage.iterable))
+            : iterator(storage.begin())
         {
             // Nothing
         }
@@ -108,7 +112,7 @@ namespace util::gen {
         }
 
         // Member Variables
-        using Iterator = decltype(std::begin(std::declval<CurrentIterable>()));
+        using Iterator = decltype(std::declval<ZipStorage<IDX, CurrentIterable>>().begin());
         Iterator iterator;
     };
 
@@ -116,8 +120,8 @@ namespace util::gen {
     struct ZipState<IDX, CurrentIterable, RemainingIterables...> {
         // Construct from a ZipStorage matching this depth
         explicit constexpr ZipState(ZipStorage<IDX, CurrentIterable, RemainingIterables...>& storage)
-                : iterator(std::begin(storage.iterable))
-                , next_state(storage.next_storage)
+            : iterator(std::begin(storage.iterable))
+            , next_state(storage.next_storage)
         {
             // Nothing
         }
@@ -131,9 +135,9 @@ namespace util::gen {
             if constexpr(N == IDX) { return *iterator; }
             else { return next_state.template get<N>(); }
         }
-        
+
         // Member Variables
-        using Iterator = decltype(std::begin(std::declval<CurrentIterable>()));
+        using Iterator = decltype(std::declval<ZipStorage<IDX, CurrentIterable>>().begin());
         Iterator iterator;
 
         using NextState = ZipState<IDX+1, RemainingIterables...>;
