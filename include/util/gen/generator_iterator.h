@@ -34,6 +34,7 @@ namespace util::gen {
         constexpr decltype(auto) operator*() { return *generator_; }
         constexpr GeneratorIterator& operator++() { ++generator_; return *this; }
         constexpr bool operator!=(const GeneratorEnd&) const { return generator_.operator bool(); }
+        constexpr bool operator==(const GeneratorEnd& end) const { return !operator !=(end); }
 
     private:
         //------------------------------------------------------------------------------
