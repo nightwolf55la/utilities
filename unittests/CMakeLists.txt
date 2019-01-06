@@ -6,5 +6,6 @@ add_executable(utilities_ut
         ut_util_gen_enumerator.cpp
         ut_util_gen_generator.cpp
         ut_util_gen_range.cpp
+        ut_util_gen_zip.cpp
     )
 target_link_libraries(utilities_ut utilities)
