@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <utility>
 #include "generator_iterator.h"
 
 namespace util::gen {
