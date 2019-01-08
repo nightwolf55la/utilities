@@ -149,3 +149,29 @@ TEST_CASE("zip - rvalues") {
     }
     CHECK(last_int == 3);
 }
+
+TEST_CASE("zip - different lengths") {
+    std::vector<int> vec_1{0,1,2,3};
+    std::vector<int> vec_2{0,1,2};
+    std::list<char> list_1{'a', 'b', 'c', 'd'};
+
+    std::optional<int> last_int;
+    for(auto&&[i_1, i_2, c_1] : util::gen::zip{vec_1, vec_2, list_1}) {
+        CHECK(i_1 == i_2);
+        if(!last_int) {
+            CHECK(i_1 == 0);
+        } else {
+            CHECK(*last_int + 1 == i_1);
+        }
+        last_int = i_1;
+
+        switch(i_1) {
+            case 0: CHECK(c_1 == 'a'); break;
+            case 1: CHECK(c_1 == 'b'); break;
+            case 2: CHECK(c_1 == 'c'); break;
+            case 3: FAIL(); break;
+            default: FAIL(); break;
+        }
+    }
+    CHECK(last_int == 2);
+}

@@ -60,7 +60,7 @@ namespace util::gen {
         //------------------------------------------------------------------------------
         constexpr State& operator*() { return state_; }
         constexpr zip& operator++() { ++state_; return *this; }
-        constexpr explicit operator bool() const { return state_.iterator != std::end(storage_.iterable); }
+        constexpr explicit operator bool() const { return state_.can_advance(storage_); }
     };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +80,7 @@ namespace util::gen {
         CurrentIterable iterable;
 
         constexpr auto begin() { return std::begin(iterable); }
+        constexpr auto end() const { return std::end(iterable); }
     };
 
     template<size_t IDX, class CurrentIterable, class... RemainingIterables>
@@ -90,6 +91,7 @@ namespace util::gen {
         NextStorage next_storage;
 
         constexpr auto begin() { return std::begin(iterable); }
+        constexpr auto end() const { return std::end(iterable); }
     };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -97,8 +99,10 @@ namespace util::gen {
     ////////////////////////////////////////////////////////////////////////////////
     template<size_t IDX, class CurrentIterable>
     struct ZipState<IDX, CurrentIterable> {
+        using Storage = ZipStorage<IDX, CurrentIterable>;
+
         // Construct from a ZipStorage matching this depth
-        explicit constexpr ZipState(ZipStorage<IDX, CurrentIterable>& storage)
+        explicit constexpr ZipState(Storage& storage)
             : iterator(storage.begin())
         {
             // Nothing
@@ -106,6 +110,9 @@ namespace util::gen {
 
         // Increment this iterator
         constexpr void operator++() { ++iterator; }
+        constexpr bool can_advance(const Storage& storage) const {
+            return iterator != storage.end();
+        }
 
         // Enables structured bindings
         template <std::size_t N>
@@ -120,9 +127,11 @@ namespace util::gen {
 
     template<size_t IDX, class CurrentIterable, class... RemainingIterables>
     struct ZipState<IDX, CurrentIterable, RemainingIterables...> {
+        using Storage = ZipStorage<IDX, CurrentIterable, RemainingIterables...>;
+
         // Construct from a ZipStorage matching this depth
-        explicit constexpr ZipState(ZipStorage<IDX, CurrentIterable, RemainingIterables...>& storage)
-            : iterator(std::begin(storage.iterable))
+        explicit constexpr ZipState(Storage& storage)
+            : iterator(storage.begin())
             , next_state(storage.next_storage)
         {
             // Nothing
@@ -130,6 +139,9 @@ namespace util::gen {
 
         // Increment this iterator and all remaining iterators
         constexpr void operator++() { ++iterator; ++next_state; }
+        constexpr bool can_advance(const Storage& storage) const {
+            return iterator != storage.end() && next_state.can_advance(storage.next_storage);
+        }
 
         // Enables structured bindings
         template <std::size_t N>
